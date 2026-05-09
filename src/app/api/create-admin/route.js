@@ -1,6 +1,6 @@
 export async function POST(request) {
   const { body } = await request.json();
-  const userExists = await prisma.user.findUnique({
+  const userExists = await prisma.admin.findUnique({
     where: {
       email: body.email,
     },
@@ -11,7 +11,7 @@ export async function POST(request) {
     });
   }
 
-  const userCreated = await prisma.user.create({
+  const userCreated = await prisma.admin.create({
     name: body.name,
     email: body.email,
     password: body.password,
