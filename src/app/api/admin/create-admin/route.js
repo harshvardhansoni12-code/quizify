@@ -22,7 +22,7 @@ export async function POST(request) {
     });
   }
   return Response.json(
-    JSON.stringify({ message: "User created successfully" }),
+    { message: "User created successfully" },
     {
       status: 201,
     },
