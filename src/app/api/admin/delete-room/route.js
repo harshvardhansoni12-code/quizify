@@ -11,15 +11,24 @@ export async function DELETE(request) {
     );
   }
 
-  const deleted = await prisma.room.deleteMany({
-    where: { id: roomId, adminId },
-  });
-  if (deleted.count === 0) {
+  try {
+    await prisma.roomMember.deleteMany({ where: { roomId } });
+
+    const deleted = await prisma.room.deleteMany({
+      where: { id: roomId, adminId },
+    });
+    if (deleted.count === 0) {
+      return Response.json(
+        { message: "Room not found or not owned by admin" },
+        { status: 404 },
+      );
+    }
+
+    return Response.json({ message: "Room deleted" }, { status: 200 });
+  } catch (err) {
     return Response.json(
-      { message: "Room not found or not owned by admin" },
-      { status: 404 },
+      { message: "Could not delete room", error: err?.message || String(err) },
+      { status: 500 },
     );
   }
-
-  return Response.json({ message: "Room deleted" }, { status: 200 });
 }

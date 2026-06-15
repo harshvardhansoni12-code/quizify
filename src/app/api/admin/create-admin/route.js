@@ -18,20 +18,27 @@ export async function POST(request) {
   }
 
   const hashedPassword = await hash(password, 12);
-  const adminCreated = await prisma.admin.create({
-    data: {
-      name,
-      email,
-      password: hashedPassword,
-    },
-  });
+  try {
+    const adminCreated = await prisma.admin.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+      },
+    });
 
-  if (!adminCreated) {
-    return Response.json({ message: "Admin not created" }, { status: 500 });
+    if (!adminCreated) {
+      return Response.json({ message: "Admin not created" }, { status: 500 });
+    }
+
+    return Response.json(
+      { message: "Admin created successfully", adminId: adminCreated.id },
+      { status: 201 },
+    );
+  } catch (err) {
+    return Response.json(
+      { message: "Admin creation failed", error: err?.message || String(err) },
+      { status: 500 },
+    );
   }
-
-  return Response.json(
-    { message: "Admin created successfully", adminId: adminCreated.id },
-    { status: 201 },
-  );
 }
