@@ -1,4 +1,4 @@
-const base = "http://localhost:3000";
+const base = process.env.BASE || "http://localhost:3000";
 
 async function req(path, opts = {}) {
   const res = await fetch(base + path, opts);
@@ -22,7 +22,7 @@ async function req(path, opts = {}) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name: "Smoke User",
-      email: `smoke.user+${Date.now()}@example.com`,
+      email: `smokess.user+${Date.now()}@example.com`,
       password: "pass1234",
     }),
   });
@@ -34,7 +34,7 @@ async function req(path, opts = {}) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name: "Smoke Admin",
-      email: `smoke.admin+${Date.now()}@example.com`,
+      email: `smokesss.admin+${Date.now()}@example.com`,
       password: "adminpass",
     }),
   });
@@ -68,16 +68,5 @@ async function req(path, opts = {}) {
     });
     console.log(join);
   }
-
-  if (roomId && adminId) {
-    console.log("\nDELETE /api/admin/delete-room");
-    const del = await req("/api/admin/delete-room", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ roomId, adminId }),
-    });
-    console.log(del);
-  }
-
   process.exit(0);
 })();
