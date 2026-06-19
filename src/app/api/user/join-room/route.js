@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { joinRoom } from "@/lib/RoomMemberService";
+import { getRoomByCode } from "@/lib/RoomService";
 
 export async function POST(request) {
   const body = await request.json();
@@ -11,7 +13,7 @@ export async function POST(request) {
     );
   }
 
-  const room = await prisma.room.findUnique({ where: { code: roomCode } });
+  const room = await getRoomByCode(roomCode);
   if (!room) {
     return Response.json({ message: "Room not found" }, { status: 404 });
   }
@@ -22,23 +24,12 @@ export async function POST(request) {
   }
 
   try {
-    const existing = await prisma.roomMember.findUnique({
-      where: { roomId_userId: { roomId: room.id, userId } },
-    });
-    if (existing) {
-      return Response.json({ message: "Already joined" }, { status: 200 });
-    }
-  } catch (e) {
-    // ignore - findUnique may throw if constraint name differs in generated client
-  }
-
-  try {
-    const member = await prisma.roomMember.create({
-      data: { roomId: room.id, userId },
-    });
+    const member = await joinRoom(room.id, userId);
+    const statusCode = member.joinedAt ? 201 : 200;
+    const message = member.joinedAt ? "Joined room" : "Already joined";
     return Response.json(
-      { message: "Joined room", memberId: member.id },
-      { status: 201 },
+      { message, memberId: member.id },
+      { status: statusCode },
     );
   } catch (err) {
     return Response.json(
