@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { deleteRoom } from "@/lib/RoomService";
 
 export async function DELETE(request) {
   const body = await request.json();
@@ -12,12 +12,8 @@ export async function DELETE(request) {
   }
 
   try {
-    await prisma.roomMember.deleteMany({ where: { roomId } });
-
-    const deleted = await prisma.room.deleteMany({
-      where: { id: roomId, adminId },
-    });
-    if (deleted.count === 0) {
+    const deletedCount = await deleteRoom(roomId, adminId);
+    if (deletedCount === 0) {
       return Response.json(
         { message: "Room not found or not owned by admin" },
         { status: 404 },
